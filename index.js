@@ -12,7 +12,7 @@ const { NoteRouter } = require("./routes/Notes.route")
 app.use(express.json())
 
 app.get("/",(req,res)=>{
-    req.json("home page")
+    res.send("home page")
 })
 app.use("/users",userRouter)
 app.use(userAuth)
