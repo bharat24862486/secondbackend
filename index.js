@@ -11,7 +11,9 @@ const { userAuth } = require("./middleware/user.middleware")
 const { NoteRouter } = require("./routes/Notes.route")
 app.use(express.json())
 
-
+app.get("/",(req,res)=>{
+    req.send("home page")
+})
 app.use("/users",userRouter)
 app.use(userAuth)
 
