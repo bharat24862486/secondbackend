@@ -1,67 +1,64 @@
+const express = require("express")
+const userSchema = require("../model/user.model")
+const jwt = require("jsonwebtoken")
+const bcrypt = require('bcrypt');
 
-const express=require("express")
-const { UserModel } = require("../models/user.model")
-const jwt=require("jsonwebtoken")
-const userRouter=express.Router()
-const bcrypt=require("bcrypt")
+const userRouter = express.Router()
 
-
-
-userRouter.post("/register",async(req,res)=>{
-    let {name,email,password,age}=req.body
-    let data=await UserModel.findOne({email})
-if(data){
-    console.log(data)
-    res.send({"msg":'user already exist'})
-}else{
-
-    try{
-        bcrypt.hash(password, 8, async (err, hash)=>{
-        const user=new UserModel({name,email,password:hash,age})
-        await user.save()
-        res.send({"msg":"user Registered"})
-        });
-        }catch(err){
-        res.send({"err":err.message})
-        console.log(err)
-        }
-    }
+userRouter.get("/", async (req, res) => {
+    let data = await userSchema.find()
+    res.send(data)
 })
 
-userRouter.post("/login",async(req,res)=>{
-const {email,password}=req.body
+userRouter.post("/register", async (req, res) => {
+    let { name, email, password } = req.body
+    console.log(password)
 
-
-// 9643704642 anas
     try {
+        bcrypt.hash(password, 8, async (err, hash) => {
+            const user = new userSchema({ name, email, password: hash })
+            user.save()
+            res.send("Registered")
+        });
+    } catch (err) {
+        res.send("Error in registering the user")
+        console.log(err)
+    }
 
-        const user =  await UserModel.findOne({email})
-        if(user){
-       console.log(user,"line 32")
-       bcrypt.compare(password, user.password, function(err, result) {
-          if(result){
-           const token=jwt.sign({authorID:user._id,author:user.name},"pankaj")
-           res.status(200).send({"msg":"login succesfull","token":token})
-          }else{
-           res.status(200).send({"msg":"wrong Credentials"})
-          }
-       });  
-        }
-       } catch (error) {
-           res.status(400).send({err:error.message})
-       }
-
-
-
-
-
-
-
+ 
 })
 
 
 
+userRouter.post("/login", async (req, res) => {
+    let { email, password } = req.body
+    console.log(email, password, "line 52")
+    try {
+        const ok = await userSchema.findOne({ email })
+        if (ok) {
 
-module.exports={
-    userRouter
+
+            console.log(ok)
+            bcrypt.compare(password, ok.password, async (err, result) => {
+            if (result) {
+                const token = jwt.sign({ authorID: ok._id, authorName:ok.name }, 'bharat');
+                // console.log(token)
+                res.send({ "msg": "login Successfull", token })
+            } else {
+                res.send({ "err": "wrong credentials" })
+            }
+            // result == true
+          });
+        } else {
+    res.send("invalid email and password")
 }
+
+
+    } catch (error) {
+    res.send("error")
+}
+})
+
+
+
+module.exports = {userRouter}
