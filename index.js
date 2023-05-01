@@ -1,14 +1,20 @@
 
 const express=require("express")
-const { connection } = require("./dbs")
-const { userRouter } = require("./routes/user.routes")
+require("dotenv").config()
 const cors=require("cors")
+// const { connection } = require("./db")
+// const noteRoute = require("./routes/note.route")
+// const { userRouter } = require("./routes/user.route")
+// const Auth = require("./middleware/Auth.middleware")
+const { userRouter } = require("./routes/user.routes")
+const { NoteRouter } = require("./routes/Notes.route")
+const { userAuth } = require("./middleware/user.middleware")
+const { connection } = require("./dbs")
 const app=express()
 app.use(cors())
 
-const jwt=require("jsonwebtoken")
-const { userAuth } = require("./middleware/user.middleware")
-const { NoteRouter } = require("./routes/Notes.route")
+
+
 app.use(express.json())
 
 app.get("/",(req,res)=>{
@@ -20,9 +26,9 @@ app.use(userAuth)
 app.use("/notes",NoteRouter)
 
 
+// let port = process.env.port
 
-
-app.listen(4500,async ()=>{
+app.listen(8080,async ()=>{
 try {
     await connection
     console.log("connected to db")
@@ -30,5 +36,5 @@ try {
     console.log(error)
 }
 
-console.log("connection establisted at port 4500")
+console.log("connection establisted at port 8080")
 })
